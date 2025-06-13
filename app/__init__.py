@@ -57,39 +57,39 @@ def login_form():
 #-----------------------------------------------------------
 # Things page route - Show all the things, and new thing form
 #-----------------------------------------------------------
-@app.get("/things/")
+@app.get("/tasks/")
 def show_all_things():
     with connect_db() as client:
         # Get all the things from the DB
         sql = """
-            SELECT things.id,
-                   things.name,
+            SELECT tasks.id,
+                   tasks.name,
                    users.name AS owner
 
-            FROM things
-            JOIN users ON things.user_id = users.id
+            FROM tasks
+            JOIN users ON tasks.user_id = users.id
 
-            ORDER BY things.name ASC
+            ORDER BY tasks.name ASC
         """
         result = client.execute(sql)
-        things = result.rows
+        tasks = result.rows
 
         # And show them on the page
-        return render_template("pages/things.jinja", things=things)
+        return render_template("pages/tasks.jinja", tasks=tasks)
 
 
 #-----------------------------------------------------------
 # Thing page route - Show details of a single thing
 #-----------------------------------------------------------
-@app.get("/thing/<int:id>")
+@app.get("/task/<int:id>")
 def show_one_thing(id):
     with connect_db() as client:
         # Get the thing details from the DB, including the owner info
         sql = """
-            SELECT things.id,
-                   things.name,
-                   things.price,
-                   things.user_id,
+            SELECT tasks.id,
+                   tasks.name,
+                   tasks.price,
+                   tasks.user_id,
                    users.name AS owner
 
             FROM things
@@ -120,24 +120,24 @@ def show_one_thing(id):
 def add_a_thing():
     # Get the data from the form
     name  = request.form.get("name")
-    price = request.form.get("price")
+    priority = request.form.get("priority")
 
     # Sanitise the inputs
     name = html.escape(name)
-    price = html.escape(price)
+    priority = html.escape(priority)
 
     # Get the user id from the session
     user_id = session["user_id"]
 
     with connect_db() as client:
         # Add the thing to the DB
-        sql = "INSERT INTO things (name, price, user_id) VALUES (?, ?, ?)"
-        values = [name, price, user_id]
+        sql = "INSERT INTO tasks (name, priority, user_id) VALUES (?, ?, ?)"
+        values = [name, priority, user_id]
         client.execute(sql, values)
 
         # Go back to the home page
-        flash(f"Thing '{name}' added", "success")
-        return redirect("/things")
+        flash(f"Task added", "success")
+        return redirect("/")
 
 
 #-----------------------------------------------------------
@@ -152,13 +152,13 @@ def delete_a_thing(id):
 
     with connect_db() as client:
         # Delete the thing from the DB only if we own it
-        sql = "DELETE FROM things WHERE id=? AND user_id=?"
+        sql = "DELETE FROM tasks WHERE id=? AND user_id=?"
         values = [id, user_id]
         client.execute(sql, values)
 
         # Go back to the home page
         flash("Thing deleted", "success")
-        return redirect("/things")
+        return redirect("/")
 
 
 #-----------------------------------------------------------
