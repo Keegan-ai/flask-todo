@@ -26,14 +26,12 @@
             {% for task in tasks %}
 
                 <li>
-                    <a>
-                        <strong>{{ tasks.name }}</strong> - owned by {{ users.id }}
-                    </a>
+                    <strong>{{ task.name }}</strong> {{ task.priority }}
                 </li>
 
             {% else %}
 
-                <p>None!</p>
+                <p>Currently no task Up!</p>
 
             {% endfor %}
         </ul>
@@ -49,14 +47,12 @@
             {% for task in Tasks %}
 
                 <li>
-                    <a href="/thing/{{ thing.id }}">
-                        <strong>{{ thing.name }}</strong> - owned by {{ thing.owner }}
-                    </a>
+                 
                 </li>
 
             {% else %}
 
-                <p>None!</p>
+                <p>No Task Completed</p>
 
             {% endfor %}
         </ul>

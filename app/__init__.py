@@ -27,15 +27,30 @@ init_error(app)     # Handle errors and exceptions
 #-----------------------------------------------------------
 @app.get("/")
 def index():
-    return render_template("pages/home.jinja")
+    if "logged_in" in session:
+        with connect_db() as client:
+            # Get the logged in user id
+            user_id = session["user_id"]
 
+            # Get all the things from the DB
+            sql = """
+                SELECT id,
+                    name,
+                    priority,
+                    completed
 
-#-----------------------------------------------------------
-# About page route
-#-----------------------------------------------------------
-@app.get("/about/")
-def about():
-    return render_template("pages/about.jinja")
+                FROM tasks
+                
+                WHERE user_id=?
+
+                ORDER BY priority DESC
+            """
+            params = [user_id]
+            result = client.execute(sql, params)
+            tasks = result.rows
+        return render_template("pages/home.jinja", tasks=tasks)
+    else:
+        return render_template("pages/welcome.jinja")
 
 
 #-----------------------------------------------------------
@@ -57,7 +72,7 @@ def login_form():
 #-----------------------------------------------------------
 # Things page route - Show all the things, and new thing form
 #-----------------------------------------------------------
-@app.get("/tasks/")
+@app.get("/task")
 def show_all_things():
     with connect_db() as client:
         # Get all the things from the DB
@@ -68,47 +83,15 @@ def show_all_things():
 
             FROM tasks
             JOIN users ON tasks.user_id = users.id
-
+            
             ORDER BY tasks.name ASC
         """
         result = client.execute(sql)
         tasks = result.rows
 
         # And show them on the page
-        return render_template("pages/tasks.jinja", tasks=tasks)
+        return render_template("/")
 
-
-#-----------------------------------------------------------
-# Thing page route - Show details of a single thing
-#-----------------------------------------------------------
-@app.get("/task/<int:id>")
-def show_one_thing(id):
-    with connect_db() as client:
-        # Get the thing details from the DB, including the owner info
-        sql = """
-            SELECT tasks.id,
-                   tasks.name,
-                   tasks.price,
-                   tasks.user_id,
-                   users.name AS owner
-
-            FROM things
-            JOIN users ON things.user_id = users.id
-
-            WHERE things.id=?
-        """
-        values = [id]
-        result = client.execute(sql, values)
-
-        # Did we get a result?
-        if result.rows:
-            # yes, so show it on the page
-            thing = result.rows[0]
-            return render_template("pages/thing.jinja", thing=thing)
-
-        else:
-            # No, so show error
-            return not_found_error()
 
 
 #-----------------------------------------------------------
