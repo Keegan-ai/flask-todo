@@ -24,10 +24,26 @@
 
         <ul>
             {% for task in tasks %}
+            <p class="task">
+                <span class="priority">{{ task.priority }}</span>
+                <span class="name">{{ task.name }}</span>
+                <span class="status">
+                    {% if task.completed %}
+                        <a href=/incomplete/{{ task.id }}>
+                        []
+                        </a>
 
-                <li>
-                    <strong>{{ task.name }}</strong> {{ task.priority }}
-                </li>
+                    
+                    {% else %}
+
+                        <a href=/complete/{{ task.id }}>
+                        [X]
+                        </a>
+
+                    {% endif %}
+            
+                </span>
+            </p>
 
             {% else %}
 
@@ -46,17 +62,13 @@
         <ul>
             {% for task in Tasks %}
 
-                <li>
-                 
-                </li>
-
+            
             {% else %}
 
                 <p>No Task Completed</p>
 
             {% endfor %}
         </ul>
-
     </article>
 
     {# Only show form if user is logged in #}
@@ -79,7 +91,7 @@
                     type="number"
                     name="priority"
                     min="0"
-                    placeholder="Priority"
+                    placeholder="Priority 1-5"
                     required
                 >
 

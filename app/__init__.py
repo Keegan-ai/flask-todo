@@ -51,7 +51,7 @@ def index():
         return render_template("pages/home.jinja", tasks=tasks)
     else:
         return render_template("pages/welcome.jinja")
-
+    
 
 #-----------------------------------------------------------
 # User registration form route
@@ -67,31 +67,6 @@ def register_form():
 @app.get("/login")
 def login_form():
     return render_template("pages/login.jinja")
-
-
-#-----------------------------------------------------------
-# Things page route - Show all the things, and new thing form
-#-----------------------------------------------------------
-@app.get("/task")
-def show_all_things():
-    with connect_db() as client:
-        # Get all the things from the DB
-        sql = """
-            SELECT tasks.id,
-                   tasks.name,
-                   users.name AS owner
-
-            FROM tasks
-            JOIN users ON tasks.user_id = users.id
-            
-            ORDER BY tasks.name ASC
-        """
-        result = client.execute(sql)
-        tasks = result.rows
-
-        # And show them on the page
-        return render_template("/")
-
 
 
 #-----------------------------------------------------------
@@ -124,25 +99,45 @@ def add_a_thing():
 
 
 #-----------------------------------------------------------
-# Route for deleting a thing, Id given in the route
+# Route for unticking a task, Id given in the route
 # - Restricted to logged in users
 #-----------------------------------------------------------
-@app.get("/delete/<int:id>")
+@app.get("/incomplete/<int:id>")
 @login_required
-def delete_a_thing(id):
+def incomplete_a_task(id):
     # Get the user id from the session
     user_id = session["user_id"]
 
     with connect_db() as client:
-        # Delete the thing from the DB only if we own it
-        sql = "DELETE FROM tasks WHERE id=? AND user_id=?"
+        # Incomlete a task from the DB only if we own it
+        sql = "SELECT FROM tasks WHERE id=? AND user_id=?"
         values = [id, user_id]
         client.execute(sql, values)
 
         # Go back to the home page
-        flash("Thing deleted", "success")
+        flash("Task unticked", "Incomplete")
         return redirect("/")
 
+
+#-----------------------------------------------------------
+# Route for ticking a task complete, Id given in the route
+# - Restricted to logged in users
+#-----------------------------------------------------------
+@app.get("/complete/<int:id>")
+@login_required
+def comlete_a_task(id):
+    # Get the user id from the session
+    user_id = session["user_id"]
+
+    with connect_db() as client:
+        # Complete the task from the DB only if we own it
+        sql = "SELECT FROM tasks WHERE id=? AND user_id=?"
+        values = [id, user_id]
+        client.execute(sql, values)
+
+        # Go back to the home page
+        flash("Task ticked", "Complete")
+        return redirect("/")
 
 #-----------------------------------------------------------
 # Route for adding a user when registration form submitted
