@@ -125,7 +125,7 @@ def incomplete_a_task(id):
 #-----------------------------------------------------------
 @app.get("/complete/<int:id>")
 @login_required
-def comlete_a_task(id):
+def complete_a_task(id):
     # Get the user id from the session
     user_id = session["user_id"]
 
