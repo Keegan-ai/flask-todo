@@ -106,16 +106,15 @@ def add_a_thing():
 @login_required
 def incomplete_a_task(id):
     # Get the user id from the session
-    user_id = session["user_id"]
 
     with connect_db() as client:
         # Incomlete a task from the DB only if we own it
-        sql = "SELECT FROM tasks WHERE id=? AND user_id=?"
-        values = [id, user_id]
+        sql = "UPDATE tasks SET completed=0 WHERE id=?"
+        values = [id]
         client.execute(sql, values)
 
         # Go back to the home page
-        flash("Task unticked", "Incomplete")
+        flash("Completed", "Done")
         return redirect("/")
 
 
@@ -126,17 +125,15 @@ def incomplete_a_task(id):
 @app.get("/complete/<int:id>")
 @login_required
 def complete_a_task(id):
-    # Get the user id from the session
-    user_id = session["user_id"]
 
     with connect_db() as client:
         # Complete the task from the DB only if we own it
-        sql = "SELECT FROM tasks WHERE id=? AND user_id=?"
-        values = [id, user_id]
+        sql = "UPDATE tasks SET completed=1 WHERE id=?"
+        values = [id]
         client.execute(sql, values)
 
         # Go back to the home page
-        flash("Task ticked", "Complete")
+        flash("Uncompleted", "Complete")
         return redirect("/")
 
 #-----------------------------------------------------------
