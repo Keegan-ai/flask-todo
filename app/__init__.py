@@ -225,3 +225,18 @@ def logout():
     flash("Logged out successfully", "success")
     return redirect("/")
 
+#-----------------------------------------------------------
+# Route for deleting a thing, Id given in the route
+#-----------------------------------------------------------
+@app.get("/delete/<int:id>")
+def delete_a_task(id):
+    with connect_db() as client:
+        # Delete the thing from the DB
+        sql = "DELETE FROM tasks WHERE id=?"
+        values = [id]
+        client.execute(sql, values)
+
+        # Go back to the home page
+        flash("Task Deleted", "warning")
+        return redirect("/")
+

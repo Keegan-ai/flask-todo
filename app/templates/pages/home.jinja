@@ -24,25 +24,18 @@
 
         <ul>
             {% for task in tasks %}
-            <p class="task">
-                <span class="priority">{{ task.priority }}</span>
-                <span class="name">{{ task.name }}</span>
-                <span class="status">
-                    {% if task.completed %}
-                        <a href=/incomplete/{{ task.id }}>
-                        []
-                        </a>
+                {% if task.completed == false %}     
+                    <p class="task">
+                    <span class="priority">{{ task.priority }}</span>
+                    <span class="name">{{ task.name }}</span>
+                    <span class="status">
 
-                    
-                    {% else %}
+                            <a href=/complete/{{ task.id }}>
+                            ⬜
+                            </a>
 
-                        <a href=/complete/{{ task.id }}>
-                        [✓]
-                        </a>
-
-                    {% endif %}
-            
-                </span>
+                    </span>
+            {% endif %}
             </p>
 
             {% else %}
@@ -54,6 +47,29 @@
 
     </article>
 
+   <article>
+
+    <h2>Completed Tasks</h2>
+
+        <ul>
+            {% for task in tasks %}
+            {% if task.completed %}
+                <p class="task">
+                    <span class="priority">{{ task.priority }}</span>
+                    <span class="name">{{ task.name }}</span>
+                    <span class="status">
+                        
+                        <a href=/incomplete/{{ task.id }}>
+                        ✅
+                        </a>
+
+                        <a href="/delete/{{ tasks.id }}" onclick="return confirm('Do you really want to delete it');">Delete</a>
+                    </span>
+                </p>
+            {% endif %}
+            {% endfor%}
+        </ul>    
+   </article>
 
     {# Only show form if user is logged in #}
     {% if session.user_id %}
